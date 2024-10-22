@@ -1,25 +1,3 @@
-`timescale 1ns / 1ps
-//////////////////////////////////////////////////////////////////////////////////
-// Company: 
-// Engineer: 
-// 
-// Create Date: 10/18/2024 09:29:56 AM
-// Design Name: 
-// Module Name: top
-// Project Name: 
-// Target Devices: 
-// Tool Versions: 
-// Description: 
-// 
-// Dependencies: 
-// 
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
-
-
 module top(
     input   wire clk,
     input   wire reset_n,
@@ -32,7 +10,10 @@ module top(
     
     wire [7:0]  incoming_data;
     wire        incoming_data_valid;
-    
+    wire [7:0]  data_in;
+    wire        we;
+    wire [18:0] addr;
+    wire [7:0]  data_out;
     
     // module instantiations
     
@@ -46,13 +27,27 @@ module top(
         .valid(incoming_data_valid)
     );
     
-    controller u_controller (
+    controller mlp (
         .clk(clk),
         .reset_n(reset_n),
         .mode(mode),
         .incoming_data(incoming_data),
         .incoming_data_valid(incoming_data_valid),
+        .data_in(data_in),
+        .we(we),
+        .addr(addr),
+        .data_out(data_out),
         .result_data(result_data),  
         .result_data_valid(data_ready)
     );
+    
+    memory_controller sram (
+        .clk(clk),
+        .we(we),
+        .addr(addr),
+        .data_in(data_in),
+        .data_out(data_out)
+        
+    );
+    
 endmodule
