@@ -13,7 +13,7 @@ module memory_controller (
     wire sram_ce [277:0];                 // Chip enable signal for each SRAM block
 
     // Split address into block select and internal address
-    wire [8:0] block_select;              // Higher 9 bits for block selection
+    wire [9:0] block_select;              // Higher 9 bits for block selection
     wire [9:0] block_addr;                // Lower 10 bits for address within block
 
     assign block_select = addr[18:10];
@@ -26,12 +26,15 @@ module memory_controller (
             assign sram_ce[i] = (block_select == i);   // Enable only the selected block
 
             // Instantiate SRAM block
-            sram_8x1024 sram_inst (
-                .clk(clk),
-                .we(we & sram_ce[i]),                  // Write enable only for selected block
-                .addr(block_addr),                     // Address within the block
-                .data_in(data_in),                     // Data to write
-                .data_out(sram_data_out[i])            // Data from the SRAM
+            sky130_sram_1kbyte_1rw1r_8x1024_8 sram_inst0 (
+                .clk0(clk),
+                .csb0(~sram_ce[i]),
+                .web0(~we),                  // Write enable only for selected block
+                .wmask0(1'b1),
+                .addr0(block_addr),                     // Address within the block
+                .din0(data_in),                     // Data to write
+                .dout0(sram_data_out[i])            // Data from the SRAM
+           
             );
         end
     endgenerate
